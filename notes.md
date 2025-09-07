@@ -2,7 +2,7 @@
 
 [My startup - Simon](https://simon.cs260.click)
 doing this in the terminal is a lot more complicated than just using the vscode UI
-more notes
+more more notes
 
 ## Helpful links
 
