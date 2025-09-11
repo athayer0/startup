@@ -8,9 +8,9 @@ A web page for returned missionaries that takes in the user's start and end date
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] Proper use of Markdown
-- [ ] A concise and compelling elevator pitch
-- [ ] Description of key features
+- [x] Proper use of Markdown
+- [x] A concise and compelling elevator pitch
+- [x] Description of key features
 - [ ] Description of how you will use each technology
 - [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
@@ -33,9 +33,15 @@ sequenceDiagram
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- Ability to enter in mission start and end dates
+- Option to filter by songs, movies, pop culture, world news, etc.
+- Display of reviews for rateable items like movies and songs
+- Ability to change what category to filter by
+- Ability to bookmark events and come back to them later
+- Display of timeline for key events
+- Videos, photos, and links for popular songs, movies, articles, etc. they missed
+- Shareability to social media
+- Option to create Spotify playlist from the songs they missed by genre
 
 ### Technologies
 
