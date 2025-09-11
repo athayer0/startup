@@ -2,7 +2,7 @@
 
 [My Notes](notes.md)
 
-A web page for returned missionaries that takes in the user's start and end dates of their mission and returns everything in pop culture, news, and the world they missed while gone.
+A web page for returned missionaries that takes in the user's start and end dates of their mission and returns everything that happened in pop culture, the news, and the world as a whole while they were gone.
 
 ## 🚀 Specification Deliverable
 
@@ -11,7 +11,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] Proper use of Markdown
 - [x] A concise and compelling elevator pitch
 - [x] Description of key features
-- [ ] Description of how you will use each technology
+- [x] Description of how you will use each technology
 - [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ### Elevator pitch
@@ -22,7 +22,6 @@ Just got home from your mission and feel like the world hit fast-forward while y
 
 ![Design image](placeholder.png)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 ```mermaid
 sequenceDiagram
@@ -47,12 +46,15 @@ sequenceDiagram
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** - Provides the structure of the app, including the mission date input, event timeline, and category filters.
+- **CSS** - Styles the app with good spacing and colloring and ensures it looks good and works well on all screen sizes, including mobile.
+- **React** - Manages dynamic content and interactivity, letting the timeline, event cards, and filters update instantly when users interact.
+- **Service** - Backend sercive with endpoints for:
+    - login
+    - fetches and processes events, news, and media from third party sources
+    - retrieving and submitting bookmarked events
+- **DB/Login** - Stores user accounts, saved timelines, and preferences. Register and login users. Credentials securely stored in database.
+- **WebSocket** - Supports real-time features, like live chats between missionaries that got home around the same time
 
 ## 🚀 AWS deliverable
 
