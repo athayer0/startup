@@ -20,7 +20,7 @@ Just got home from your mission and feel like the world hit fast-forward while y
 
 ### Design
 
-![Design image](placeholder.png)
+![Design image](welcomehomeelder-roughdraft.jpg)
 
 
 ```mermaid
