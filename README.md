@@ -71,7 +71,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Links** - Navigation section at the top of each page as well as links from page to page using buttons. 
 - [x] **Text** - Headers to descibe each page and text for info on event data from the timeline
 - [x] **3rd party API placeholder** - "Generate Timeline" button in date-entry.html will use OpenAI GPT AI to curate a timeline of events the user missed based on the dates they entered.
-- [x] **Images** - Added an image to the login page and an icon that appears in the tab up top.
+- [x] **Images** - Added an image to the login page and date entry page, and an icon that appears in the tab up top.
 - [x] **Login placeholder** - Input boxes with placeholders for username and password.
 - [x] **DB data placeholder** - Option to save events that appear in the saved events page and stay between logins. Events can be removed as well.
 - [x] **WebSocket placeholder** - Displays in the header of each page the total amount of people on the webpage as well as the total times each event has been saved next to each event.
