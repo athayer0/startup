@@ -20,7 +20,7 @@
     <body>
         <nav class="navbar navbar-dark bg-primary shadow-sm sticky-top">
             <div class="container">
-                <a class="navbar-brand" href="index.html">Home</a>
+                <a class="navbar-brand" href="#">Home</a>
                 <ul class="navbar-nav ms-auto d-flex flex-row">
                     <li class="nav-item me-3"><a class="nav-link text-white" href="index.html">Login</a></li>
                     <li class="nav-item me-3"><a class="nav-link text-white" href="date-entry.html">Date Entry</a></li>
@@ -37,22 +37,36 @@
             </div>
         </header>
         
-        <main>
-            <p><b>User:</b> Mystery User</p>
-            <hr>
-            <img src="rm-meme2.jpg" alt-text="rm meme 2" width="250px">
-            <h4>Enter your mission start and end dates below:</h4>
-            <form type="get" action="timeline.html">
-                <div>
-                    <span>Start date:</span>
-                    <input type="text" placeholder="MM-DD-YYYY">
+        <main class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="mb-4 text-center">
+                        <p class="fw-bold mb-1">User: Mystery User</p>
+                        <hr>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <img src="returnedwithhonor.jpg" alt="RM Meme 2" class="img-fluid" style="max-width: 250px;">
+                    </div>
+
+                    <div class="card shadow-sm p-4">
+                        <h4 class="card-title mb-4 text-center">Enter your mission start and end dates below:</h4>
+                        <form type="get" action="timeline.html">
+                            <div class="mb-3">
+                                <label for="start-date" class="form-label">Start date</label>
+                                <input type="text" id="start-date" class="form-control" placeholder="MM-DD-YYYY">
+                            </div>
+                            <div class="mb-3">
+                                <label for="end-date" class="form-label">End date</label>
+                                <input type="text" id="end-date" class="form-control" placeholder="MM-DD-YYYY">
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="submit" class="btn btn-primary">Generate Timeline</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div>
-                    <span>End date:</span>
-                    <input type="text" placeholder="MM-DD-YYYY">
-                </div>
-                <button type="submit">Generate Timeline</button>
-            </form>
+            </div>
         </main>
         
         <footer class="bg-primary text-white text-center py-3 mt-5 sticky-bottom">
