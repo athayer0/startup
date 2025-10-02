@@ -1,8 +1,7 @@
 # CS 260 Notes
 
-[My startup - Simon](https://simon.cs260.click)
-doing this in the terminal is a lot more complicated than just using the vscode UI
-more more notes
+[My startup - Welcome Home, Elder!](https://startup.welcomehomeelder.com)
+Doing commits, pulls, and pushes in the terminal is a lot more complicated than just using the vscode UI
 
 ## Helpful links
 
@@ -12,8 +11,8 @@ more more notes
 
 ## AWS
 
-My IP address is: 54.81.96.130
-Launching my AMI I initially put it on a private subnet. Even though it had a public IP address and the security group was right, I wasn't able to connect to it.
+My IP address is: 52.203.120.107
+Just always keep the instance running (although it should be technically fine if you stop it because it has an elastic IP).
 
 ## Caddy
 
@@ -21,9 +20,7 @@ No problems worked just like it said in the [instruction](https://github.com/web
 
 ## HTML
 
-This was easy. I was careful to use the correct structural elements such as header, footer, main, nav, and form. The links between the three views work great using the `a` element.
-
-The part I didn't like was the duplication of the header and footer code. This is messy, but it will get cleaned up when I get to React.
+This was easy. Now to add functionality to the skeleton.
 
 ## CSS
 
