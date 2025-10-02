@@ -80,12 +80,12 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Header, footer, and main content body** - I did not complete this part of the deliverable.
-- [ ] **Navigation elements** - I did not complete this part of the deliverable.
-- [ ] **Responsive to window resizing** - I did not complete this part of the deliverable.
-- [ ] **Application elements** - I did not complete this part of the deliverable.
-- [ ] **Application text content** - I did not complete this part of the deliverable.
-- [ ] **Application images** - I did not complete this part of the deliverable.
+- [x] **Header, footer, and main content body** - Used Bootstrap to style and center the content of the page.
+- [x] **Navigation elements** - Created sticky navigation bar at the top of the page that allows for switching between pages.
+- [x] **Responsive to window resizing** - Used column and container system from Bootstrap to allow for resizing.
+- [x] **Application elements** - Replaced old HTML elements with colorful and sleek Bootstrap designs.
+- [x] **Application text content** - adjusted position, sizing, font, and color of text to make it more appealing.
+- [x] **Application images** - Replaced old meme images with more theme fitting images on the header of each page.
 
 ## 🚀 React part 1: Routing deliverable
 
