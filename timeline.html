@@ -29,7 +29,7 @@
                 </ul>
             </div>
         </nav>
-        
+
         <header class="py-5 bg-white shadow-sm">
             <div class="container">
                 <div class="row align-items-center">
@@ -53,54 +53,71 @@
             </div>
         </header>
 
-        <main>
-            <p><b>User:</b> Mystery User</p>
-            <p><b>Mission start date:</b> Sept 9, 2023</p>
-            <p><b>Mission end date:</b> August 29, 2025</p>
-            <hr>
+        <main class="container my-5">
+            <div class="mb-4">
+                <p class="mb-1"><b>User:</b> Mystery User</p>
+                <p class="mb-1"><b>Mission start date:</b> Sept 9, 2023</p>
+                <p><b>Mission end date:</b> August 29, 2025</p>
+                <hr>
+            </div>
 
-            <p><em>***Timeline generated using OpenAI GPT API based on your mission dates***</em></p>
+            <p class="fst-italic text-muted text-center">
+                ***Timeline generated using OpenAI GPT API based on your mission dates***
+            </p>
 
-            <h2>Timeline</h2>
-            <label for="menu">Timeline Category:</label>
-            <select id="menu" name="menu">
-                <option value="all">All</option>
-                <option value="world-news">World News</option>
-                <option value="pop-culture">Pop Culture</option>
-                <option value="sports">Sports</option>
-                <option value="movies">Movies</option>
-                <option value="music">Music</option>
-                <option value="memes">Memes</option>
-                <option value="tech">Tech</option>
-            </select>
-            <div>
-                <ol>
-                    <li>
-                        <p><u>Feb 9, 2025</u> - <b>Sports</b></p>
-                        <p>Philadelphia Eagles beat KC Chiefs 40-22 in Super Bowl LIX.</p>
-                        <p>💾 Saved by 23 Elders</p>
-                        <label>
-                        <input type="checkbox">Saved</label>
-                    </li>
-                    <li>
-                        <p><u>April 12, 2025</u> - <b>Music</b></p>
-                        <p>Alex Warren's "Ordinary" reaches #1 on Bilboard Top 100 songs.</p>
-                        <p>💾 Saved by 41 Elders</p>
-                        <input type="checkbox">Saved</label>
-                    </li>
-                    <li>
-                        <p><u>May 22, 2025</u> - <b>World News</b></p>
-                        <p>U.S. Inflation Persists Above Target Amid Tariff and Trade Uncertainty.</p>
-                        <p>💾 Saved by 13 Elders</p>
-                        <input type="checkbox">Saved</label>
-                    </li>
-                    <li>
-                        <p><u>August 26, 2025</u> - <b>Pop Culture</b></p>
-                        <p>Taylor Swift gets engaged to KC Chiefs Tight End, Travis Kelce.</p>
-                        <p>💾 Saved by 38 Elders</p>
-                        <input type="checkbox">Saved</label>
-                    </li>
-                </ol>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="fw-bold">Timeline</h2>
+                <div>
+                    <label for="menu" class="form-label me-2">Category:</label>
+                    <select id="menu" name="menu" class="form-select d-inline-block w-auto">
+                        <option value="all">All</option>
+                        <option value="world-news">World News</option>
+                        <option value="pop-culture">Pop Culture</option>
+                        <option value="sports">Sports</option>
+                        <option value="movies">Movies</option>
+                        <option value="music">Music</option>
+                        <option value="memes">Memes</option>
+                        <option value="tech">Tech</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="list-group">
+                <div class="list-group-item">
+                    <p class="mb-1"><u>Feb 9, 2025</u> - <b>Sports</b></p>
+                    <p class="mb-1">Philadelphia Eagles beat KC Chiefs 40-22 in Super Bowl LIX.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0">💾 (Saved by 23 Elders)</p>
+                        <button class="btn btn-primary btn-sm">Save Event</button>
+                    </div>
+                </div>
+
+                <div class="list-group-item">
+                    <p class="mb-1"><u>April 12, 2025</u> - <b>Music</b></p>
+                    <p class="mb-1">Alex Warren's "Ordinary" reaches #1 on Billboard Top 100 songs.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0">💾 (Saved by 41 Elders)</p>
+                        <button class="btn btn-primary btn-sm">Save Event</button>
+                    </div>
+                </div>
+
+                <div class="list-group-item">
+                    <p class="mb-1"><u>May 22, 2025</u> - <b>World News</b></p>
+                    <p class="mb-1">U.S. Inflation Persists Above Target Amid Tariff and Trade Uncertainty.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0">💾 (Saved by 13 Elders)</p>
+                        <button class="btn btn-primary btn-sm">Save Event</button>
+                    </div>
+                </div>
+
+                <div class="list-group-item">
+                    <p class="mb-1"><u>August 26, 2025</u> - <b>Pop Culture</b></p>
+                    <p class="mb-1">Taylor Swift gets engaged to KC Chiefs Tight End, Travis Kelce.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0">💾 (Saved by 38 Elders)</p>
+                        <button class="btn btn-primary btn-sm">Save Event</button>
+                    </div>
+                </div>
             </div>
         </main>
 
