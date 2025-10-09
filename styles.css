@@ -1,0 +1,14 @@
+.bg-primary {
+    background-color: navy !important;
+}
+
+.btn-primary {
+    background-color: navy !important;
+    border-color: navy !important;
+}
+
+@media (max-height: 700px) {           
+    footer {
+        display: none;
+    }
+}
