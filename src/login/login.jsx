@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 
 export function Login() {
   return (
@@ -8,7 +9,7 @@ export function Login() {
                 <div className="card shadow-sm">
                     <div className="card-body">
                         <h2 className="card-title text-center mb-4">Sign in here:</h2>
-                        <form action="date-entry.html" method="get">
+                        <div>
                             <div className="mb-3">
                                 <label for="username" className="form-label">Username</label>
                                 <input type="text" id="username" className="form-control" placeholder="Enter username"/>
@@ -18,10 +19,10 @@ export function Login() {
                                 <input type="password" id="password" className="form-control" placeholder="Enter password"/>
                             </div>
                             <div className="d-grid gap-2">
-                                <button type="submit" className="btn btn-primary">Login</button>
-                                <button type="submit" className="btn btn-outline-secondary">Sign Up</button>
+                                <Button variant="primary" onClick={() => window.location.href = "/date-entry"}>Login</Button>
+                                <Button variant="outline-secondary" onClick={() => window.location.href = "/date-entry"}>Sign Up</Button>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>

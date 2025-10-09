@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 
 export function DateEntry() {
   return (
@@ -12,7 +13,7 @@ export function DateEntry() {
 
                 <div className="card shadow-sm p-4">
                     <h4 className="card-title mb-4 text-center">Enter your mission start and end dates below:</h4>
-                    <form type="get" action="timeline.html">
+                    <div>
                         <div className="mb-3">
                             <label for="start-date" className="form-label">Start date</label>
                             <input type="text" id="start-date" className="form-control" placeholder="MM-DD-YYYY"/>
@@ -22,9 +23,9 @@ export function DateEntry() {
                             <input type="text" id="end-date" className="form-control" placeholder="MM-DD-YYYY"/>
                         </div>
                         <div className="d-grid gap-2 mt-3">
-                            <button type="submit" className="btn btn-primary">Generate Timeline</button>
+                            <Button variant="primary" onClick={() => window.location.href = "/timeline"}>Generate Timeline</Button>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 
 export function Timeline() {
   return (
@@ -69,9 +70,7 @@ export function Timeline() {
             </div>
         </div>
         <div className="text-center mt-4">
-            <a href="saved-events.html" className="btn btn-primary btn-lg">
-                View Saved Events
-            </a>
+            <Button variant="primary" onClick={() => window.location.href = "/saved-events"}>View Saved Events</Button>
         </div>
     </main>
   );
