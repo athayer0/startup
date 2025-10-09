@@ -27,7 +27,7 @@ export default function App() {
                 <div className="container">
                     <div className="row align-items-center">
                         <div className="col-2 text-center">
-                            <img src="/public/bom.png" alt="Left Logo" className="img-fluid" style={{ maxHeight: '200px' }}/>
+                            <img src="/bom.png" alt="Left Logo" className="img-fluid" style={{ maxHeight: '200px' }}/>
                         </div>
 
                         <div className="col-8 text-center">
@@ -40,7 +40,7 @@ export default function App() {
                         </div>
 
                         <div className="col-2 text-center">
-                            <img src="/public/returnedwithhonor.jpg" alt="Right Logo" className="img-fluid" style={{ maxHeight: '200px' }}/>
+                            <img src="/returnedwithhonor.jpg" alt="Right Logo" className="img-fluid" style={{ maxHeight: '200px' }}/>
                         </div>
                     </div>
                 </div>
