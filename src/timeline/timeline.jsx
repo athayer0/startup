@@ -15,6 +15,7 @@ export function Timeline() {
     const fetchEventsFromAPI = async (startDate, endDate) => {
         setLoading(true);
         try {
+            const savedEventsList = JSON.parse(localStorage.getItem('savedEvents') || '[]');
             const mockEvents = [
                 {
                     id: 1,
@@ -48,7 +49,7 @@ export function Timeline() {
                     savedBy: 38,
                     isSaved: false
                 }
-            ];
+            ].map(event => ({...event, isSaved: savedEventsList.some(saved => saved.id === event.id)}));
             
             setEvents(mockEvents);
         } catch (error) {
@@ -80,6 +81,8 @@ export function Timeline() {
             console.error('Error saving event:', error);
         }
     };
+
+    const filteredEvents = selectedCategory === 'all' ? events : events.filter(event => event.category.toLowerCase().replace(' ', '-') === selectedCategory);
 
     return (
         <main className="container my-5">
@@ -126,7 +129,7 @@ export function Timeline() {
                 </div>
             ) : (
                 <div className="list-group">
-                    {events.map(event => (
+                    {filteredEvents.map(event => (
                         <div key={event.id} className="list-group-item">
                             <p className="mb-1"><u>{event.date}</u> - <b>{event.category}</b></p>
                             <p className="mb-1">{event.description}</p>

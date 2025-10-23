@@ -53,6 +53,10 @@ export function SavedEvents() {
                         <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
+            ) : savedEvents.length === 0 ? (
+                <div className="alert alert-info text-center">
+                    No saved events yet. Go back to the timeline to save some events!
+                </div>
             ) : (
                 <div className="list-group">
                     {savedEvents.map(event => (
