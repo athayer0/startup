@@ -1,13 +1,19 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
 
 export function SavedEvents() {
+  const navigate = useNavigate();
+  const userName = localStorage.getItem('userName') || 'Mystery User';
+  const startDate = localStorage.getItem('missionStartDate') || 'Not set';
+  const endDate = localStorage.getItem('missionEndDate') || 'Not set';
+
   return (
     <main className="container my-5">
         <div className="mb-4">
-            <p className="mb-1"><b>User:</b> Mystery User</p>
-            <p className="mb-1"><b>Mission start date:</b> Sept 9, 2023</p>
-            <p><b>Mission end date:</b> August 29, 2025</p>
+            <p className="mb-1"><b>User:</b> {userName}</p>
+            <p className="mb-1"><b>Mission start date:</b> {startDate}</p>
+            <p><b>Mission end date:</b> {endDate}</p>
             <hr/>
             <h2 className="fw-bold">Saved Events</h2>
         </div>
@@ -32,7 +38,7 @@ export function SavedEvents() {
             </div>
         </div>
         <div className="text-center mt-4">
-            <Button variant="primary" onClick={() => window.location.href = "/timeline"}>Back to Timeline</Button>
+            <Button variant="primary" onClick={() => navigate('/timeline')}>Back to Timeline</Button>
         </div>
     </main>
   );
