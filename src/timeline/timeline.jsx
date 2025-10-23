@@ -1,13 +1,19 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
 
 export function Timeline() {
+  const navigate = useNavigate();
+  const userName = localStorage.getItem('userName') || 'Mystery User';
+  const startDate = localStorage.getItem('missionStartDate') || 'Not set';
+  const endDate = localStorage.getItem('missionEndDate') || 'Not set';
+
   return (
     <main className="container my-5">
         <div className="mb-4">
-            <p className="mb-1"><b>User:</b> Mystery User</p>
-            <p className="mb-1"><b>Mission start date:</b> Sept 9, 2023</p>
-            <p><b>Mission end date:</b> August 29, 2025</p>
+            <p className="mb-1"><b>User:</b> {userName}</p>
+            <p className="mb-1"><b>Mission start date:</b> {startDate}</p>
+            <p><b>Mission end date:</b> {endDate}</p>
             <hr/>
         </div>
 
@@ -18,7 +24,7 @@ export function Timeline() {
         <div className="d-flex align-items-center justify-content-between mb-4">
             <h2 className="fw-bold">Timeline</h2>
             <div>
-                <label for="menu" className="form-label me-2">Category:</label>
+                <label htmlFor="menu" className="form-label me-2">Category:</label>
                 <select id="menu" name="menu" className="form-select d-inline-block w-auto">
                     <option value="all">All</option>
                     <option value="world-news">World News</option>
@@ -70,7 +76,7 @@ export function Timeline() {
             </div>
         </div>
         <div className="text-center mt-4">
-            <Button variant="primary" onClick={() => window.location.href = "/saved-events"}>View Saved Events</Button>
+            <Button variant="primary" onClick={() => navigate('/saved-events')}>View Saved Events</Button>
         </div>
     </main>
   );
