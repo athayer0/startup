@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,25 +8,34 @@ export function SavedEvents() {
     const startDate = localStorage.getItem('missionStartDate') || 'Not set';
     const endDate = localStorage.getItem('missionEndDate') || 'Not set';
     
-    const [savedEvents, setSavedEvents] = useState([
-        {
-            id: 1,
-            date: 'Feb 9, 2025',
-            category: 'Sports',
-            description: 'Philadelphia Eagles beat KC Chiefs 40-22 in Super Bowl LIX.',
-            savedBy: 23,
-            isSaved: true
-        },
-        {
-            id: 4,
-            date: 'August 26, 2025',
-            category: 'Pop Culture',
-            description: 'Taylor Swift gets engaged to KC Chiefs Tight End, Travis Kelce.',
-            savedBy: 38,
-            isSaved: true
-        }
-    ]);
+    const [savedEvents, setSavedEvents] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const fetchSavedEvents = async () => {
+        setLoading(true);
+        try {
+            const events = JSON.parse(localStorage.getItem('savedEvents') || '[]');
+            setSavedEvents(events);
+        } catch (error) {
+            console.error('Error fetching saved events:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchSavedEvents();
+    }, []);
+
+    const handleRemoveEvent = async (eventId) => {
+        try {
+            const updatedEvents = savedEvents.filter(event => event.id !== eventId);
+            setSavedEvents(updatedEvents);
+            localStorage.setItem('savedEvents', JSON.stringify(updatedEvents));
+        } catch (error) {
+            console.error('Error removing event:', error);
+        }
+    };
 
     return (
         <main className="container my-5">
@@ -38,20 +47,31 @@ export function SavedEvents() {
                 <h2 className="fw-bold">Saved Events</h2>
             </div>
 
-            <div className="list-group">
-                {savedEvents.map(event => (
-                    <div key={event.id} className="list-group-item">
-                        <p className="mb-1"><u>{event.date}</u> - <b>{event.category}</b></p>
-                        <p className="mb-1">{event.description}</p>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <p className="mb-0">💾 (Saved by {event.savedBy} Elders)</p>
-                            <button className="btn btn-danger btn-sm">
-                                Remove Event
-                            </button>
-                        </div>
+            {loading ? (
+                <div className="text-center my-5">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
                     </div>
-                ))}
-            </div>
+                </div>
+            ) : (
+                <div className="list-group">
+                    {savedEvents.map(event => (
+                        <div key={event.id} className="list-group-item">
+                            <p className="mb-1"><u>{event.date}</u> - <b>{event.category}</b></p>
+                            <p className="mb-1">{event.description}</p>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <p className="mb-0">💾 (Saved by {event.savedBy} Elders)</p>
+                                <button 
+                                    className="btn btn-danger btn-sm"
+                                    onClick={() => handleRemoveEvent(event.id)}
+                                >
+                                    Remove Event
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             <div className="text-center mt-4">
                 <Button variant="primary" onClick={() => navigate('/timeline')}>
