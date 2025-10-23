@@ -30,7 +30,7 @@ Took me a couple hours to get the hang of the grid system, general syntax, and f
 
 ## React Part 1: Routing
 
-Setting up Vite and React was pretty simple. I had a bit of trouble because of conflicting CSS. This isn't as straight forward as you would find with Svelte or Vue, but I made it work in the end. If there was a ton of CSS it would be a real problem. It sure was nice to have the code structured in a more usable way.
+Had to fix some buttons and add some "/" that html doesn't require because of some conflicting CSS. Overall the instructions were clear and I was able to reformat things without any major problems.
 
 ## React Part 2: Reactivity
 
