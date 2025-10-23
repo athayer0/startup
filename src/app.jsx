@@ -42,7 +42,7 @@ function App() {
                             <h1 className="display-4 fw-bold">Welcome Home, Elder!</h1>
                             <p className="lead">Two years is a long time. Let's see what you missed...</p>
                             <p className="text-muted">
-                                🌍 <em>Returned missionaries currently online:</em>
+                                🌍 <em>Returned missionaries currently online: </em>
                                 <span className="fw-semibold">47</span>
                             </p>
                         </div>

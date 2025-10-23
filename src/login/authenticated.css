@@ -1,0 +1,9 @@
+#user-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center content */
+    align-items: center;     /* Horizontally center content */
+    flex-grow: 1;            /* Take all available space */
+    min-height: 50vh; /* Adjust 120px if header+footer is different */
+    box-sizing: border-box;
+}

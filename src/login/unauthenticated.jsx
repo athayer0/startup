@@ -26,11 +26,11 @@ export function Unauthenticated(props) {
                     <div className="card-body">
                         <h2 className="card-title text-center mb-4">Sign in here:</h2>
                         <div>
-                            <div className="mb-3">
+                            <div className="mb-3  text-start">
                                 <label for="username" className="form-label">Username</label>
                                 <input type="text" id="username" className="form-control" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="Enter username"/>
                             </div>
-                            <div className="mb-3">
+                            <div className="mb-3 text-start">
                                 <label for="password" className="form-label">Password</label>
                                 <input type="password" id="password" className="form-control" onChange={(e) => setPassword(e.target.value)} placeholder="Enter password"/>
                             </div>
