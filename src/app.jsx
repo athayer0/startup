@@ -6,8 +6,13 @@ import { Login } from './login/login';
 import { DateEntry } from './date-entry/date-entry';
 import { Timeline } from './timeline/timeline';
 import { SavedEvents } from './saved-events/saved-events';
+import { AuthState } from './login/authState';
 
-export default function App() {
+function App() {
+  const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
+  const currentAuthState = userName ? AuthState.Authenticated : AuthState.Unauthenticated;
+  const [authState, setAuthState] = React.useState(currentAuthState);
+
   return (
     <BrowserRouter>
         <div>
@@ -16,9 +21,12 @@ export default function App() {
                     <a className="navbar-brand" href="#">Home</a>
                     <ul className="navbar-nav ms-auto d-flex flex-row">
                         <li className="nav-item me-3"><NavLink className="nav-link text-white" to="">Login</NavLink></li>
-                        <li className="nav-item me-3"><NavLink className="nav-link text-white" to="date-entry">Date Entry</NavLink></li>
-                        <li className="nav-item me-3"><NavLink className="nav-link text-white" to="timeline">Timeline</NavLink></li>
-                        <li className="nav-item"><NavLink className="nav-link text-white" to="saved-events">Saved Events</NavLink></li>
+                        {authState === AuthState.Authenticated && (
+                            <li className="nav-item me-3"><NavLink className="nav-link text-white" to="date-entry">Date Entry</NavLink></li>)}
+                        {authState === AuthState.Authenticated && (
+                            <li className="nav-item me-3"><NavLink className="nav-link text-white" to="timeline">Timeline</NavLink></li>)}
+                        {authState === AuthState.Authenticated && (
+                            <li className="nav-item"><NavLink className="nav-link text-white" to="saved-events">Saved Events</NavLink></li>)}
                     </ul>
                 </div>
             </nav>
@@ -47,10 +55,22 @@ export default function App() {
             </header>
 
             <Routes>
-                <Route path='/' element={<Login />} exact />
-                <Route path='/date-entry' element={<DateEntry />} />
-                <Route path='/timeline' element={<Timeline />} />
-                <Route path='/saved-events' element={<SavedEvents />} />
+                <Route 
+                    path='/' 
+                    element={
+                        <Login 
+                            userName={userName}
+                            authState={authState}
+                            onAuthChange={(userName, authState) => {
+                                setAuthState(authState);
+                                setUserName(userName);
+                            }}
+                        />
+                    } 
+                    exact />
+                <Route path='/date-entry' element={<DateEntry userName={userName} />} />
+                <Route path='/timeline' element={<Timeline userName={userName} />} />
+                <Route path='/saved-events' element={<SavedEvents userName={userName} />} />
                 <Route path='*' element={<NotFound />} />
             </Routes>
 
@@ -68,3 +88,5 @@ export default function App() {
 function NotFound() {
   return <main className="container-fluid bg-secondary text-center">404: Return to sender. Address unknown.</main>;
 }
+
+export default App;
