@@ -4,45 +4,93 @@ import { useNavigate } from 'react-router-dom';
 
 export function SavedEvents() {
     const navigate = useNavigate();
-    const userName = localStorage.getItem('userName') || 'Mystery User';
-    const startDate = localStorage.getItem('missionStartDate') || 'Not set';
-    const endDate = localStorage.getItem('missionEndDate') || 'Not set';
-    
+    const [user, setUser] = useState(null);
     const [savedEvents, setSavedEvents] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    // Fetch current user from backend
+    const fetchUser = async () => {
+        try {
+            const response = await fetch('/api/user/me');
+            if (response.ok) {
+                const userData = await response.json();
+                setUser(userData);
+            } else {
+                // Not authenticated, redirect to login
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            navigate('/');
+        }
+    };
 
     const fetchSavedEvents = async () => {
         setLoading(true);
         try {
-            const events = JSON.parse(localStorage.getItem('savedEvents') || '[]');
-            setSavedEvents(events);
+            // Fetch saved events from backend
+            const response = await fetch('/api/saved-events');
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch saved events');
+            }
+
+            const data = await response.json();
+            setSavedEvents(data.savedEvents);
         } catch (error) {
             console.error('Error fetching saved events:', error);
+            alert('Failed to load saved events. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchSavedEvents();
+        fetchUser();
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            fetchSavedEvents();
+        }
+    }, [user]);
 
     const handleRemoveEvent = async (eventId) => {
         try {
+            // Remove event via API
+            const response = await fetch(`/api/saved-events/${eventId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to remove event');
+            }
+
+            // Update local state
             const updatedEvents = savedEvents.filter(event => event.id !== eventId);
             setSavedEvents(updatedEvents);
-            localStorage.setItem('savedEvents', JSON.stringify(updatedEvents));
         } catch (error) {
             console.error('Error removing event:', error);
+            alert('Failed to remove event. Please try again.');
         }
     };
+
+    if (!user) {
+        return (
+            <div className="container my-5 text-center">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <main className="container my-5">
             <div className="mb-4">
-                <p className="mb-1"><b>User:</b> {userName}</p>
-                <p className="mb-1"><b>Mission start date:</b> {startDate}</p>
-                <p><b>Mission end date:</b> {endDate}</p>
+                <p className="mb-1"><b>User:</b> {user.userName}</p>
+                <p className="mb-1"><b>Mission start date:</b> {user.missionStartDate || 'Not set'}</p>
+                <p><b>Mission end date:</b> {user.missionEndDate || 'Not set'}</p>
                 <hr/>
                 <h2 className="fw-bold">Saved Events</h2>
             </div>
