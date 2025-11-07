@@ -144,6 +144,36 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no extra 
 
 
 
+// Save an event for a user
+app.post('/api/saved-events', (req, res) => {
+  const { userName, event } = req.body;
+  
+  if (!userSavedEvents[userName]) {
+    userSavedEvents[userName] = [];
+  }
+  
+  const isAlreadySaved = userSavedEvents[userName].some(e => e.id === event.id);
+  
+  if (!isAlreadySaved) {
+    userSavedEvents[userName].push({ ...event, isSaved: true });
+  }
+  
+  res.json({ message: 'Event saved successfully' });
+});
+
+// Remove a saved event for a user
+app.delete('/api/saved-events/:userName/:eventId', (req, res) => {
+  const { userName, eventId } = req.params;
+  
+  if (userSavedEvents[userName]) {
+    userSavedEvents[userName] = userSavedEvents[userName].filter(
+      event => event.id !== parseInt(eventId)
+    );
+  }
+  
+  res.json({ message: 'Event removed successfully' });
+});
+
 // Default error handler
 app.use(function (err, req, res, next) {
     res.status(500).send({ type: err.name, message: err.message });
