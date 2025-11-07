@@ -99,8 +99,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **All functionality implemented or mocked out** - I did not complete this part of the deliverable.
-- [ ] **Hooks** - I did not complete this part of the deliverable.
+- [x] **All functionality implemented or mocked out** - Events can be saved and removed, drop down menu sorts events, mock events added, date and username saved to local storage.
+- [x] **Hooks** - Used hooks to manage if events are saved or not, updating save count, toggling loading visuals while parsing mock events soon to be from the API.
 
 ## 🚀 Service deliverable
 
