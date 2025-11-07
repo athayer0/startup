@@ -142,7 +142,12 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no extra 
   }
 });
 
-
+// Get saved events for a user
+app.get('/api/saved-events/:userName', (req, res) => {
+  const { userName } = req.params;
+  const savedEvents = userSavedEvents[userName] || [];
+  res.json({ savedEvents });
+});
 
 // Save an event for a user
 app.post('/api/saved-events', (req, res) => {
