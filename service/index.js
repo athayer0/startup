@@ -10,7 +10,6 @@ const authCookieName = 'token';
 
 // In-memory storage (disappears when service restarts)
 let users = [];
-let savedEvents = {};
 
 // OpenAI client
 const openai = new OpenAI({
@@ -78,6 +77,72 @@ const verifyAuth = async (req, res, next) => {
         res.status(401).send({ msg: 'Unauthorized' });
     }
 };
+
+// In-memory storage for saved events
+const userSavedEvents = {};
+
+// Generate timeline using OpenAI API
+app.post('/api/timeline/generate', async (req, res) => {
+  const { startDate, endDate } = req.body;
+  
+  try {
+    const prompt = `Generate a timeline of 8-12 significant real events that occurred between ${startDate} and ${endDate}. Include events from categories: World News, Pop Culture, Sports, Movies, Music, Memes, and Tech.
+
+Return ONLY a valid JSON array with this exact structure (no markdown, no extra text):
+[
+  {
+    "date": "MMM DD, YYYY",
+    "category": "Category Name",
+    "description": "Brief one-sentence description of the event"
+  }
+]`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant that generates accurate timelines of historical events. Always return valid JSON arrays only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1500
+      })
+    });
+
+    const data = await response.json();
+    const content = data.choices[0].message.content.trim();
+    
+    // Remove markdown code blocks if present
+    const jsonString = content.replace(/```json\n?|\n?```/g, '').trim();
+    const events = JSON.parse(jsonString);
+    
+    // Add IDs and metadata
+    const eventsWithMetadata = events.map((event, index) => ({
+      id: Date.now() + index,
+      ...event,
+      savedBy: Math.floor(Math.random() * 50) + 1,
+      isSaved: false
+    }));
+    
+    res.json({ events: eventsWithMetadata });
+  } catch (error) {
+    console.error('Error generating timeline:', error);
+    res.status(500).json({ error: 'Failed to generate timeline' });
+  }
+});
+
+
 
 // Default error handler
 app.use(function (err, req, res, next) {
