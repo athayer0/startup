@@ -20,14 +20,34 @@ Just got home from your mission and feel like the world hit fast-forward while y
 
 ### Design
 
-![Design image](welcomehomeelder-roughdraft.jpg)
+![Design image](public/welcomehomeelder-roughdraft.jpg)
 
 
 ```mermaid
 sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
+    actor User
+    participant Server
+    participant Gemini
+
+    title Welcome Home, Elder!
+
+    User->Server: Create account
+    Server->User: Set auth cookie
+    
+    User->Server: Log in
+    Server->User: Set new auth cookie
+    
+    User->Server: Generate timeline
+    Server->Gemini: Request timeline events
+    Gemini->Server: Return events
+    Server->User: Return events list
+    
+    User->Server: Save event
+    Server->User: Confirm saved
+    
+    User->Server: Get saved events
+    Server->User: Return saved events
+
 ```
 
 ### Key features
