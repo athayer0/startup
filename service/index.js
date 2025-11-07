@@ -2,218 +2,208 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const express = require('express');
 const uuid = require('uuid');
-const OpenAI = require('openai');
+const { GoogleGenAI } = require('@google/genai');
 require('dotenv').config();
 
 const app = express();
 const authCookieName = 'token';
 
-// In-memory storage (disappears when service restarts)
 let users = [];
+const userSavedEvents = {};
 
-// OpenAI client
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+// Initialize Gemini client
+const gemini = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY
 });
 
-// The service port
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
 
-// JSON body parsing using built-in middleware
 app.use(express.json());
-
-// Use the cookie parser middleware for tracking authentication tokens
 app.use(cookieParser());
-
-// Serve up the front-end static content hosting
 app.use(express.static('public'));
 
-// Router for service endpoints
-var apiRouter = express.Router();
-app.use(`/api`, apiRouter);
+const apiRouter = express.Router();
+app.use('/api', apiRouter);
 
-// CreateAuth a new user
+// --- Auth routes unchanged (just switched field name to userName etc) ---
 apiRouter.post('/auth/create', async (req, res) => {
-  if (await findUser('email', req.body.email)) {
-    res.status(409).send({ msg: 'Existing user' });
-  } else {
-    const user = await createUser(req.body.email, req.body.password);
-
-    setAuthCookie(res, user.token);
-    res.send({ email: user.email });
+  if (await findUser('userName', req.body.userName)) {
+    return res.status(409).send({ msg: 'Existing user' });
   }
+  const user = await createUser(req.body.userName, req.body.password);
+  setAuthCookie(res, user.token);
+  res.send({ userName: user.userName });
 });
 
-// GetAuth login an existing user
 apiRouter.post('/auth/login', async (req, res) => {
-  const user = await findUser('email', req.body.email);
-  if (user) {
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      user.token = uuid.v4();
-      setAuthCookie(res, user.token);
-      res.send({ email: user.email });
-      return;
-    }
+  const user = await findUser('userName', req.body.userName);
+  if (user && await bcrypt.compare(req.body.password, user.password)) {
+    user.token = uuid.v4();
+    setAuthCookie(res, user.token);
+    return res.send({ userName: user.userName });
   }
   res.status(401).send({ msg: 'Unauthorized' });
 });
 
-// DeleteAuth logout a user
 apiRouter.delete('/auth/logout', async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
-  if (user) {
-    delete user.token;
-  }
+  if (user) delete user.token;
   res.clearCookie(authCookieName);
   res.status(204).end();
 });
 
-// Middleware to verify that the user is authorized to call an endpoint
+apiRouter.get('/user/me', async (req, res) => {
+  const user = await findUser('token', req.cookies[authCookieName]);
+  if (user) {
+    res.send({
+      userName: user.userName,
+      missionStartDate: user.missionStartDate || null,
+      missionEndDate: user.missionEndDate || null
+    });
+  } else {
+    res.status(401).send({ msg: 'Unauthorized' });
+  }
+});
+
+apiRouter.post('/user/mission-dates', async (req, res) => {
+  const user = await findUser('token', req.cookies[authCookieName]);
+  if (user) {
+    user.missionStartDate = req.body.startDate;
+    user.missionEndDate = req.body.endDate;
+    res.send({
+      userName: user.userName,
+      missionStartDate: user.missionStartDate,
+      missionEndDate: user.missionEndDate
+    });
+  } else {
+    res.status(401).send({ msg: 'Unauthorized' });
+  }
+});
+
 const verifyAuth = async (req, res, next) => {
-    const user = await findUser('token', req.cookies[authCookieName]);
-    if (user) {
-        next();
-    } else {
-        res.status(401).send({ msg: 'Unauthorized' });
-    }
+  const user = await findUser('token', req.cookies[authCookieName]);
+  if (user) {
+    req.user = user;
+    next();
+  } else {
+    res.status(401).send({ msg: 'Unauthorized' });
+  }
 };
 
-// In-memory storage for saved events
-const userSavedEvents = {};
-
-// Generate timeline using OpenAI API
-app.post('/api/timeline/generate', async (req, res) => {
+// --- Timeline generation using Gemini ---
+apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
   const { startDate, endDate } = req.body;
-  
+
   try {
-    const prompt = `Generate a timeline of 8-12 significant real events that occurred between ${startDate} and ${endDate}. Include events from categories: World News, Pop Culture, Sports, Movies, Music, Memes, and Tech.
+    const prompt = `Generate a timeline of 8‑12 significant real events that occurred between ${startDate} and ${endDate}. Include events from categories: World News, Pop Culture, Sports, Movies, Music, Memes, and Tech.
 
 Return ONLY a valid JSON array with this exact structure (no markdown, no extra text):
 [
   {
     "date": "MMM DD, YYYY",
     "category": "Category Name",
-    "description": "Brief one-sentence description of the event"
+    "description": "Brief one‑sentence description of the event"
   }
 ]`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful assistant that generates accurate timelines of historical events. Always return valid JSON arrays only.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500
-      })
+    // Use Gemini generateContent
+    const response = await gemini.models.generateContent({
+      model: 'gemini-2.5-flash',  // or whichever model you choose
+      contents: [
+        {
+          parts: [
+            { text: prompt }
+          ]
+        }
+      ],
+      temperature: 0.7,
+      maxTokens: 1500
     });
 
-    const data = await response.json();
-    const content = data.choices[0].message.content.trim();
-    
+    const content = response.text.trim();
+
     // Remove markdown code blocks if present
     const jsonString = content.replace(/```json\n?|\n?```/g, '').trim();
     const events = JSON.parse(jsonString);
-    
-    // Add IDs and metadata
+
     const eventsWithMetadata = events.map((event, index) => ({
       id: Date.now() + index,
       ...event,
       savedBy: Math.floor(Math.random() * 50) + 1,
       isSaved: false
     }));
-    
+
     res.json({ events: eventsWithMetadata });
   } catch (error) {
-    console.error('Error generating timeline:', error);
+    console.error('Error generating timeline with Gemini:', error);
     res.status(500).json({ error: 'Failed to generate timeline' });
   }
 });
 
-// Get saved events for a user
-app.get('/api/saved-events/:userName', (req, res) => {
-  const { userName } = req.params;
+apiRouter.get('/saved-events', verifyAuth, (req, res) => {
+  const userName = req.user.userName;
   const savedEvents = userSavedEvents[userName] || [];
   res.json({ savedEvents });
 });
 
-// Save an event for a user
-app.post('/api/saved-events', (req, res) => {
-  const { userName, event } = req.body;
-  
+apiRouter.post('/saved-events', verifyAuth, (req, res) => {
+  const userName = req.user.userName;
+  const { event } = req.body;
+
   if (!userSavedEvents[userName]) {
     userSavedEvents[userName] = [];
   }
-  
+
   const isAlreadySaved = userSavedEvents[userName].some(e => e.id === event.id);
-  
+
   if (!isAlreadySaved) {
     userSavedEvents[userName].push({ ...event, isSaved: true });
   }
-  
   res.json({ message: 'Event saved successfully' });
 });
 
-// Remove a saved event for a user
-app.delete('/api/saved-events/:userName/:eventId', (req, res) => {
-  const { userName, eventId } = req.params;
-  
+apiRouter.delete('/saved-events/:eventId', verifyAuth, (req, res) => {
+  const userName = req.user.userName;
+  const { eventId } = req.params;
+
   if (userSavedEvents[userName]) {
     userSavedEvents[userName] = userSavedEvents[userName].filter(
       event => event.id !== parseInt(eventId)
     );
   }
-  
   res.json({ message: 'Event removed successfully' });
 });
 
-// Default error handler
-app.use(function (err, req, res, next) {
-    res.status(500).send({ type: err.name, message: err.message });
+app.use(function(err, req, res, next) {
+  res.status(500).send({ type: err.name, message: err.message });
 });
 
-// Return the application's default page if the path is unknown
 app.use((_req, res) => {
-    res.sendFile('index.html', { root: 'public' });
+  res.sendFile('index.html', { root: 'public' });
 });
 
-// Create a new user
-async function createUser(email, password) {
+async function createUser(userName, password) {
   const passwordHash = await bcrypt.hash(password, 10);
-
   const user = {
-    email: email,
+    userName,
     password: passwordHash,
     token: uuid.v4(),
+    missionStartDate: null,
+    missionEndDate: null
   };
   users.push(user);
-
   return user;
 }
 
 async function findUser(field, value) {
   if (!value) return null;
-
-  return users.find((u) => u[field] === value);
+  return users.find(u => u[field] === value);
 }
 
-// setAuthCookie in the HTTP response
 function setAuthCookie(res, authToken) {
   res.cookie(authCookieName, authToken, {
     maxAge: 1000 * 60 * 60 * 24 * 365,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     sameSite: 'strict',
   });
