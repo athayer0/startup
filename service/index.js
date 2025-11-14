@@ -3,14 +3,11 @@ const bcrypt = require('bcryptjs');
 const express = require('express');
 const uuid = require('uuid');
 const { GoogleGenAI } = require('@google/genai');
+const DB = require('./database.js');
 require('dotenv').config();
 
 const app = express();
 const authCookieName = 'token';
-
-let users = [];
-const userSavedEvents = {};
-const userTimelines = {};
 
 // Initialize Gemini client
 const gemini = new GoogleGenAI({
@@ -26,8 +23,9 @@ app.use(express.static('public'));
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
+// --- Auth routes ---
 apiRouter.post('/auth/create', async (req, res) => {
-  if (await findUser('userName', req.body.userName)) {
+  if (await DB.getUser(req.body.userName)) {
     return res.status(409).send({ msg: 'Existing user' });
   }
   const user = await createUser(req.body.userName, req.body.password);
@@ -36,9 +34,10 @@ apiRouter.post('/auth/create', async (req, res) => {
 });
 
 apiRouter.post('/auth/login', async (req, res) => {
-  const user = await findUser('userName', req.body.userName);
+  const user = await DB.getUser(req.body.userName);
   if (user && await bcrypt.compare(req.body.password, user.password)) {
     user.token = uuid.v4();
+    await DB.updateUser(user);
     setAuthCookie(res, user.token);
     return res.send({ userName: user.userName });
   }
@@ -46,14 +45,17 @@ apiRouter.post('/auth/login', async (req, res) => {
 });
 
 apiRouter.delete('/auth/logout', async (req, res) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
-  if (user) delete user.token;
+  const user = await DB.getUserByToken(req.cookies[authCookieName]);
+  if (user) {
+    delete user.token;
+    await DB.updateUser(user);
+  }
   res.clearCookie(authCookieName);
   res.status(204).end();
 });
 
 apiRouter.get('/user/me', async (req, res) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
+  const user = await DB.getUserByToken(req.cookies[authCookieName]);
   if (user) {
     res.send({
       userName: user.userName,
@@ -66,10 +68,11 @@ apiRouter.get('/user/me', async (req, res) => {
 });
 
 apiRouter.post('/user/mission-dates', async (req, res) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
+  const user = await DB.getUserByToken(req.cookies[authCookieName]);
   if (user) {
     user.missionStartDate = req.body.startDate;
     user.missionEndDate = req.body.endDate;
+    await DB.updateUser(user);
     res.send({
       userName: user.userName,
       missionStartDate: user.missionStartDate,
@@ -81,7 +84,7 @@ apiRouter.post('/user/mission-dates', async (req, res) => {
 });
 
 const verifyAuth = async (req, res, next) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
+  const user = await DB.getUserByToken(req.cookies[authCookieName]);
   if (user) {
     req.user = user;
     next();
@@ -90,17 +93,19 @@ const verifyAuth = async (req, res, next) => {
   }
 };
 
-apiRouter.get('/timeline', verifyAuth, (req, res) => {
+// Get existing timeline
+apiRouter.get('/timeline', verifyAuth, async (req, res) => {
   const userName = req.user.userName;
-  const timeline = userTimelines[userName];
+  const timeline = await DB.getTimeline(userName);
   
-  if (timeline) {
-    res.json({ events: timeline });
+  if (timeline && timeline.events) {
+    res.json({ events: timeline.events });
   } else {
     res.status(404).json({ events: [] });
   }
 });
 
+// Timeline generation using Gemini
 apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
   const { startDate, endDate } = req.body;
   const userName = req.user.userName;
@@ -117,7 +122,6 @@ apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
       }
     ]`;
 
-    // Use Gemini generateContent
     const response = await gemini.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: [
@@ -132,8 +136,6 @@ apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
     });
 
     const content = response.text.trim();
-
-    // Remove markdown code blocks if present
     const jsonString = content.replace(/```json\n?|\n?```/g, '').trim();
     const events = JSON.parse(jsonString);
 
@@ -144,7 +146,8 @@ apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
       isSaved: false
     }));
 
-    userTimelines[userName] = eventsWithMetadata;
+    // Save timeline to database
+    await DB.saveTimeline(userName, eventsWithMetadata);
 
     res.json({ events: eventsWithMetadata });
   } catch (error) {
@@ -153,37 +156,30 @@ apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
   }
 });
 
-apiRouter.get('/saved-events', verifyAuth, (req, res) => {
+apiRouter.get('/saved-events', verifyAuth, async (req, res) => {
   const userName = req.user.userName;
-  const savedEvents = userSavedEvents[userName] || [];
+  const savedEvents = await DB.getSavedEvents(userName);
   res.json({ savedEvents });
 });
 
-apiRouter.post('/saved-events', verifyAuth, (req, res) => {
+apiRouter.post('/saved-events', verifyAuth, async (req, res) => {
   const userName = req.user.userName;
   const { event } = req.body;
 
-  if (!userSavedEvents[userName]) {
-    userSavedEvents[userName] = [];
-  }
-
-  const isAlreadySaved = userSavedEvents[userName].some(e => e.id === event.id);
+  const savedEvents = await DB.getSavedEvents(userName);
+  const isAlreadySaved = savedEvents.some(e => e.id === event.id);
 
   if (!isAlreadySaved) {
-    userSavedEvents[userName].push({ ...event, isSaved: true });
+    await DB.addSavedEvent(userName, { ...event, isSaved: true });
   }
   res.json({ message: 'Event saved successfully' });
 });
 
-apiRouter.delete('/saved-events/:eventId', verifyAuth, (req, res) => {
+apiRouter.delete('/saved-events/:eventId', verifyAuth, async (req, res) => {
   const userName = req.user.userName;
   const { eventId } = req.params;
 
-  if (userSavedEvents[userName]) {
-    userSavedEvents[userName] = userSavedEvents[userName].filter(
-      event => event.id !== parseInt(eventId)
-    );
-  }
+  await DB.removeSavedEvent(userName, parseInt(eventId));
   res.json({ message: 'Event removed successfully' });
 });
 
@@ -204,13 +200,8 @@ async function createUser(userName, password) {
     missionStartDate: null,
     missionEndDate: null
   };
-  users.push(user);
+  await DB.addUser(user);
   return user;
-}
-
-async function findUser(field, value) {
-  if (!value) return null;
-  return users.find(u => u[field] === value);
 }
 
 function setAuthCookie(res, authToken) {
