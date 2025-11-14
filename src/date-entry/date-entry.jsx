@@ -37,8 +37,8 @@ export function DateEntry() {
     if (startDate && endDate) {
       setLoading(true);
       try {
-        // Save mission dates to backend
-        const response = await fetch('/api/user/mission-dates', {
+        // 1. Save mission dates to backend
+        const datesResponse = await fetch('/api/user/mission-dates', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -49,15 +49,31 @@ export function DateEntry() {
           })
         });
 
-        if (!response.ok) {
+        if (!datesResponse.ok) {
           throw new Error('Failed to save mission dates');
         }
 
-        // Navigate to timeline after successful save
+        // 2. Generate and save the timeline
+        const timelineResponse = await fetch('/api/timeline/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            startDate, 
+            endDate 
+          })
+        });
+
+        if (!timelineResponse.ok) {
+          throw new Error('Failed to generate timeline');
+        }
+
+        // 3. Navigate to timeline after successful generation
         navigate('/timeline');
       } catch (error) {
-        console.error('Error saving mission dates:', error);
-        alert('Failed to save mission dates. Please try again.');
+        console.error('Error:', error);
+        alert('Failed to generate timeline. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -116,7 +132,7 @@ export function DateEntry() {
                               onClick={handleGenerateTimeline}
                               disabled={!startDate || !endDate || loading}
                             >
-                              {loading ? 'Saving...' : 'Generate Timeline'}
+                              {loading ? 'Generating Timeline...' : 'Generate Timeline'}
                             </Button>
                         </div>
                     </div>
