@@ -10,6 +10,7 @@ const authCookieName = 'token';
 
 let users = [];
 const userSavedEvents = {};
+const userTimelines = {};
 
 // Initialize Gemini client
 const gemini = new GoogleGenAI({
@@ -25,7 +26,6 @@ app.use(express.static('public'));
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
-// --- Auth routes unchanged (just switched field name to userName etc) ---
 apiRouter.post('/auth/create', async (req, res) => {
   if (await findUser('userName', req.body.userName)) {
     return res.status(409).send({ msg: 'Existing user' });
@@ -90,25 +90,36 @@ const verifyAuth = async (req, res, next) => {
   }
 };
 
-// --- Timeline generation using Gemini ---
+apiRouter.get('/timeline', verifyAuth, (req, res) => {
+  const userName = req.user.userName;
+  const timeline = userTimelines[userName];
+  
+  if (timeline) {
+    res.json({ events: timeline });
+  } else {
+    res.status(404).json({ events: [] });
+  }
+});
+
 apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
   const { startDate, endDate } = req.body;
+  const userName = req.user.userName;
 
   try {
-    const prompt = `Generate a timeline of 8‑12 significant real events that occurred between ${startDate} and ${endDate}. Include events from categories: World News, Pop Culture, Sports, Movies, Music, Memes, and Tech.
+    const prompt = `Generate a timeline of 8–12 significant real events that occurred between ${startDate} and ${endDate}. Include events from categories: World News, Pop Culture, Sports, Movies, Music, Memes, and Tech.
 
-Return ONLY a valid JSON array with this exact structure (no markdown, no extra text):
-[
-  {
-    "date": "MMM DD, YYYY",
-    "category": "Category Name",
-    "description": "Brief one‑sentence description of the event"
-  }
-]`;
+    Return ONLY a valid JSON array with this exact structure (no markdown, no extra text):
+    [
+      {
+        "date": "MMM DD, YYYY",
+        "category": "Category Name",
+        "description": "Brief one–sentence description of the event"
+      }
+    ]`;
 
     // Use Gemini generateContent
     const response = await gemini.models.generateContent({
-      model: 'gemini-2.5-flash',  // or whichever model you choose
+      model: 'gemini-2.5-flash',
       contents: [
         {
           parts: [
@@ -132,6 +143,8 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no extra 
       savedBy: Math.floor(Math.random() * 50) + 1,
       isSaved: false
     }));
+
+    userTimelines[userName] = eventsWithMetadata;
 
     res.json({ events: eventsWithMetadata });
   } catch (error) {
