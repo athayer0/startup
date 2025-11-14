@@ -20,14 +20,34 @@ Just got home from your mission and feel like the world hit fast-forward while y
 
 ### Design
 
-![Design image](welcomehomeelder-roughdraft.jpg)
+![Design image](public/welcomehomeelder-roughdraft.jpg)
 
 
 ```mermaid
 sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
+    actor User
+    participant Server
+    participant Gemini
+
+    title Welcome Home, Elder!
+
+    User->Server: Create account
+    Server->User: Set auth cookie
+    
+    User->Server: Log in
+    Server->User: Set new auth cookie
+    
+    User->Server: Generate timeline
+    Server->Gemini: Request timeline events
+    Gemini->Server: Return events
+    Server->User: Return events list
+    
+    User->Server: Save event
+    Server->User: Confirm saved
+    
+    User->Server: Get saved events
+    Server->User: Return saved events
+
 ```
 
 ### Key features
@@ -106,12 +126,12 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Node.js/Express HTTP service** - I did not complete this part of the deliverable.
-- [ ] **Static middleware for frontend** - I did not complete this part of the deliverable.
-- [ ] **Calls to third party endpoints** - I did not complete this part of the deliverable.
-- [ ] **Backend service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Frontend calls service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Supports registration, login, logout, and restricted endpoint** - I did not complete this part of the deliverable.
+- [x] **Node.js/Express HTTP service** - Built an express server that listens for HTTP requests and manages backend logic.
+- [x] **Static middleware for frontend** - Served the frontend using express.static('public')
+- [x] **Calls to third party endpoints** - Used the Google Gemini API to generate timeline events
+- [x] **Backend service endpoints** - Created API routes for auth, setting dates, generating timeline, and saving and removing events
+- [x] **Frontend calls service endpoints** - Frontend hits service endpoints to get user data about auth, dates, timeline, and saving and removing events
+- [x] **Supports registration, login, logout, and restricted endpoint** - Implemented user login with secire cookies and middleware to protect routes
 
 
 ## 🚀 DB deliverable
