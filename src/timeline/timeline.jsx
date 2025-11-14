@@ -30,20 +30,57 @@ export function Timeline() {
         fetchUser();
     }, []);
 
-    const fetchEventsFromAPI = async (startDate, endDate) => {
+    // Fetch existing timeline or generate new one if none exists
+    const fetchTimeline = async () => {
+        if (!user || !user.missionStartDate || !user.missionEndDate) {
+            return;
+        }
+
         setLoading(true);
         try {
-            // Fetch generated timeline from backend
+            // First, try to fetch existing timeline
+            const response = await fetch('/api/timeline');
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.events && data.events.length > 0) {
+                    // Timeline exists, use it
+                    setEvents(data.events);
+                } else {
+                    // No timeline exists, generate a new one
+                    await generateNewTimeline();
+                }
+            } else if (response.status === 404) {
+                // Timeline not found, generate a new one
+                await generateNewTimeline();
+            } else {
+                throw new Error('Failed to fetch timeline');
+            }
+        } catch (error) {
+            console.error('Error fetching timeline:', error);
+            alert('Failed to load timeline. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Generate a new timeline and save it
+    const generateNewTimeline = async () => {
+        try {
             const response = await fetch('/api/timeline/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ startDate, endDate })
+                body: JSON.stringify({ 
+                    startDate: user.missionStartDate, 
+                    endDate: user.missionEndDate 
+                })
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch timeline');
+                throw new Error('Failed to generate timeline');
             }
 
             const data = await response.json();
@@ -61,7 +98,21 @@ export function Timeline() {
             
             setEvents(eventsWithSavedStatus);
         } catch (error) {
-            console.error('Error fetching timeline:', error);
+            console.error('Error generating timeline:', error);
+            throw error;
+        }
+    };
+
+    // Regenerate timeline manually
+    const handleRegenerateTimeline = async () => {
+        if (!window.confirm('Are you sure you want to generate a new timeline? This will replace your current timeline.')) {
+            return;
+        }
+        
+        setLoading(true);
+        try {
+            await generateNewTimeline();
+        } catch (error) {
             alert('Failed to generate timeline. Please try again.');
         } finally {
             setLoading(false);
@@ -69,8 +120,8 @@ export function Timeline() {
     };
 
     useEffect(() => {
-        if (user && user.missionStartDate && user.missionEndDate) {
-            fetchEventsFromAPI(user.missionStartDate, user.missionEndDate);
+        if (user) {
+            fetchTimeline();
         }
     }, [user]);
 
@@ -156,7 +207,7 @@ export function Timeline() {
                     <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
-                    <p className="mt-3">Generating your timeline...</p>
+                    <p className="mt-3">Loading timeline...</p>
                 </div>
             ) : !user.missionStartDate || !user.missionEndDate ? (
                 <div className="alert alert-info text-center">
@@ -167,24 +218,35 @@ export function Timeline() {
                     No events to display.
                 </div>
             ) : (
-                <div className="list-group">
-                    {filteredEvents.map(event => (
-                        <div key={event.id} className="list-group-item">
-                            <p className="mb-1"><u>{event.date}</u> - <b>{event.category}</b></p>
-                            <p className="mb-1">{event.description}</p>
-                            <div className="d-flex justify-content-between align-items-center">
-                                <p className="mb-0">💾 (Saved by {event.savedBy} Elders)</p>
-                                <button 
-                                    className="btn btn-primary btn-sm"
-                                    onClick={() => handleSaveEvent(event.id)}
-                                    disabled={event.isSaved}
-                                >
-                                    {event.isSaved ? 'Saved' : 'Save Event'}
-                                </button>
+                <>
+                    <div className="d-flex justify-content-end mb-3">
+                        <Button 
+                            variant="outline-secondary" 
+                            size="sm"
+                            onClick={handleRegenerateTimeline}
+                        >
+                            Regenerate Timeline
+                        </Button>
+                    </div>
+                    <div className="list-group">
+                        {filteredEvents.map(event => (
+                            <div key={event.id} className="list-group-item">
+                                <p className="mb-1"><u>{event.date}</u> - <b>{event.category}</b></p>
+                                <p className="mb-1">{event.description}</p>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <p className="mb-0">💾 (Saved by {event.savedBy} Elders)</p>
+                                    <button 
+                                        className="btn btn-primary btn-sm"
+                                        onClick={() => handleSaveEvent(event.id)}
+                                        disabled={event.isSaved}
+                                    >
+                                        {event.isSaved ? 'Saved' : 'Save Event'}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                </>
             )}
 
             <div className="text-center mt-4">
