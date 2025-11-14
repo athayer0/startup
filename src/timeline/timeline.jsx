@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
@@ -30,32 +31,30 @@ export function Timeline() {
         fetchUser();
     }, []);
 
-    // Fetch existing timeline or generate new one if none exists
+    // Fetch existing timeline from backend
     const fetchTimeline = async () => {
-        if (!user || !user.missionStartDate || !user.missionEndDate) {
-            return;
-        }
-
         setLoading(true);
         try {
-            // First, try to fetch existing timeline
             const response = await fetch('/api/timeline');
             
             if (response.ok) {
                 const data = await response.json();
                 
-                if (data.events && data.events.length > 0) {
-                    // Timeline exists, use it
-                    setEvents(data.events);
-                } else {
-                    // No timeline exists, generate a new one
-                    await generateNewTimeline();
-                }
-            } else if (response.status === 404) {
-                // Timeline not found, generate a new one
-                await generateNewTimeline();
+                // Fetch saved events to mark which ones are already saved
+                const savedResponse = await fetch('/api/saved-events');
+                const savedData = await savedResponse.json();
+                const savedEventIds = savedData.savedEvents.map(e => e.id);
+                
+                // Mark events as saved if they exist in saved events
+                const eventsWithSavedStatus = data.events.map(event => ({
+                    ...event,
+                    isSaved: savedEventIds.includes(event.id)
+                }));
+                
+                setEvents(eventsWithSavedStatus);
             } else {
-                throw new Error('Failed to fetch timeline');
+                // No timeline found
+                setEvents([]);
             }
         } catch (error) {
             console.error('Error fetching timeline:', error);
@@ -65,8 +64,19 @@ export function Timeline() {
         }
     };
 
-    // Generate a new timeline and save it
-    const generateNewTimeline = async () => {
+    useEffect(() => {
+        if (user) {
+            fetchTimeline();
+        }
+    }, [user]);
+
+    // Regenerate timeline manually
+    const handleRegenerateTimeline = async () => {
+        if (!window.confirm('Are you sure you want to generate a new timeline? This will replace your current timeline.')) {
+            return;
+        }
+        
+        setLoading(true);
         try {
             const response = await fetch('/api/timeline/generate', {
                 method: 'POST',
@@ -99,31 +109,11 @@ export function Timeline() {
             setEvents(eventsWithSavedStatus);
         } catch (error) {
             console.error('Error generating timeline:', error);
-            throw error;
-        }
-    };
-
-    // Regenerate timeline manually
-    const handleRegenerateTimeline = async () => {
-        if (!window.confirm('Are you sure you want to generate a new timeline? This will replace your current timeline.')) {
-            return;
-        }
-        
-        setLoading(true);
-        try {
-            await generateNewTimeline();
-        } catch (error) {
             alert('Failed to generate timeline. Please try again.');
         } finally {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (user) {
-            fetchTimeline();
-        }
-    }, [user]);
 
     const handleSaveEvent = async (eventId) => {
         try {
@@ -212,10 +202,20 @@ export function Timeline() {
             ) : !user.missionStartDate || !user.missionEndDate ? (
                 <div className="alert alert-info text-center">
                     Please set your mission dates to generate a timeline.
+                    <div className="mt-3">
+                        <Button variant="primary" onClick={() => navigate('/date-entry')}>
+                            Go to Date Entry
+                        </Button>
+                    </div>
                 </div>
             ) : events.length === 0 ? (
                 <div className="alert alert-info text-center">
-                    No events to display.
+                    No timeline found. Please generate one.
+                    <div className="mt-3">
+                        <Button variant="primary" onClick={() => navigate('/date-entry')}>
+                            Generate Timeline
+                        </Button>
+                    </div>
                 </div>
             ) : (
                 <>
