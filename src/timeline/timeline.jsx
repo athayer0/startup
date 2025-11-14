@@ -125,7 +125,7 @@ export function Timeline() {
             </div>
 
             <p className="fst-italic text-muted text-center">
-                ***Timeline generated using OpenAI GPT API based on your mission dates***
+                ***Timeline generated using Gemini API based on your mission dates***
             </p>
 
             <div className="d-flex align-items-center justify-content-between mb-4">
