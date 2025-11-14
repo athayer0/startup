@@ -9,7 +9,6 @@ require('dotenv').config();
 const app = express();
 const authCookieName = 'token';
 
-// Initialize Gemini client
 const gemini = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY
 });
@@ -23,7 +22,7 @@ app.use(express.static('public'));
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
-// --- Auth routes ---
+// Auth routes
 apiRouter.post('/auth/create', async (req, res) => {
   if (await DB.getUser(req.body.userName)) {
     return res.status(409).send({ msg: 'Existing user' });
