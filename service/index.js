@@ -111,7 +111,7 @@ apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
   const userName = req.user.userName;
 
   try {
-    const prompt = `Generate a timeline of 8–12 significant real events that occurred between ${startDate} and ${endDate}. Include events from categories: World News, Pop Culture, Sports, Movies, Music, Memes, and Tech.
+    const prompt = `Generate a timeline of 12-16 significant real events that occurred between ${startDate} and ${endDate}. Include events from categories: World News, Pop Culture, Sports, Movies, Music, Memes, and Tech.
 
     Return ONLY a valid JSON array with this exact structure (no markdown, no extra text):
     [
@@ -142,7 +142,6 @@ apiRouter.post('/timeline/generate', verifyAuth, async (req, res) => {
     const eventsWithMetadata = events.map((event, index) => ({
       id: Date.now() + index,
       ...event,
-      savedBy: Math.floor(Math.random() * 50) + 1,
       isSaved: false
     }));
 
