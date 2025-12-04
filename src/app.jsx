@@ -70,7 +70,7 @@ function App() {
                             <p className="lead">Two years is a long time. Let's see what you missed...</p>
                             <p className="text-muted">
                                 🌍 <em>Returned missionaries currently online: </em>
-                                <span className="fw-semibold">47</span>
+                                <span className="fw-semibold">{userCount}</span>
                             </p>
                         </div>
 
