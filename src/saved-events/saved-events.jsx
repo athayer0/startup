@@ -110,11 +110,10 @@ export function SavedEvents() {
                     {savedEvents.map(event => (
                         <div key={event.id} className="list-group-item">
                             <p className="mb-1"><u>{event.date}</u> - <b>{event.category}</b></p>
-                            <p className="mb-1">{event.description}</p>
                             <div className="d-flex justify-content-between align-items-center">
-                                <p className="mb-0">💾 (Saved by {event.savedBy} Elders)</p>
+                                <p className="mb-0">{event.description}</p>
                                 <button 
-                                    className="btn btn-danger btn-sm"
+                                    className="btn btn-danger btn-sm ms-3"
                                     onClick={() => handleRemoveEvent(event.id)}
                                 >
                                     Remove Event
