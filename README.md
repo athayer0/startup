@@ -145,8 +145,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Backend listens for WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Frontend makes WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Data sent over WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **WebSocket data displayed** - I did not complete this part of the deliverable.
-- [ ] **Application is fully functional** - I did not complete this part of the deliverable.
+- [x] **Backend listens for WebSocket connection** - peerProxy.js creates a WebSocket server that listens for client connections
+- [x] **Frontend makes WebSocket connection** - app.jsx creates a WebSocket connection and listens for user count updates from the server
+- [x] **Data sent over WebSocket connection** - Active user count is sent over Websocket connection
+- [x] **WebSocket data displayed** - Active user count is displayed in the header of all pages.
+- [x] **Application is fully functional** - The app allows for account creation, timeline generation using Gemini API, and saving of event, with all data stored in MongoDB
