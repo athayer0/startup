@@ -5,6 +5,7 @@ const uuid = require('uuid');
 const { GoogleGenAI } = require('@google/genai');
 const DB = require('./database.js');
 require('dotenv').config();
+const { peerProxy } = require('./peerProxy.js');
 
 const app = express();
 const authCookieName = 'token';
@@ -212,6 +213,8 @@ function setAuthCookie(res, authToken) {
   });
 }
 
-app.listen(port, () => {
+const httpService = app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+
+peerProxy(httpService);
